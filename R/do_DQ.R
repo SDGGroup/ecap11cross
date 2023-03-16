@@ -1,16 +1,18 @@
 #' do_DQ.R
 #' @description Esegue il controllo corrispondente a `COD_CONTROLLO`.
 #' Ci sono due possibilità:
-#'     - controllo tramite query. Deve avere popolato il campo STMT_CONTROLLO con la
-#'       query che verrà utilizzata per il controllo e settando df_errors=NULL
-#'     - controllo passando direttamente il df_errors risultato del controllo in input
-#'       alla funzione. df_errors è un Data Frame che deve contenere la colonna 'output1'.
-#'       In aggiunta può contenere altre colonne: conteggio/output2/output3 (opzionali)
+#' * controllo tramite query. `catalog` deve avere popolato il campo `STMT_CONTROLLO` 
+#'   con la query che verrà utilizzata per il controllo e `df_errors=NULL`.
+#' * controllo diretto se `df_error` è passato come argomento.
 #' @param check chr, codice controllo da eseguire.
 #' @param catalog tibble, contiene tutti controlli del processo.
 #' @param project_id chr, nome del progetto GCP
 #' @param out_version int, versione dell'output
-#' @param df_error tibble, tba
+#' @param df_error tibble con almeno 1 colonna: !!! TODO: aggiungere tipi !!!
+#' * OUTPUT1,
+#' * OUTPUT2 opzionale,
+#' * OUTPUT3 opzionale,
+#' * CONTEGGIO opzionale.
 #' @param y A number.
 #' @returns Un booleano. `TRUE` in presenza di errore nel controllo.
 #' @export
@@ -33,7 +35,8 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
     out2log("\n ",qry)
 
     temp      <- bq_project_query(project_id, qry)
-    df_errors <- bq_table_download(temp)
+    df_errors <- bq_table_do
+    wnload(temp)
   }
 
   # Casistica in cui non ho il conteggio (controllo di data quality ERROR)

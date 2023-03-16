@@ -11,5 +11,7 @@ write_df_on_postgres <- function(nome_tabella,oggetto){
   db <- create_conn()
   result <- dbWriteTable(db,nome_tabella,oggetto, append = TRUE)
   dbDisconnect(db)
+  
   return(result)
+  
 }

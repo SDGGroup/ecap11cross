@@ -10,5 +10,5 @@ create_conn()
 Un S4 object ereditato da \link[DBI]{dbConnect}, usato per comunicare con il database.
 }
 \description{
-Crea una connessione a POSTEGRES.
+Crea una connessione a Postgres
 }

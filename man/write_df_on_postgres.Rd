@@ -14,8 +14,8 @@ write_df_on_postgres(nome_tabella, oggetto)
 \item{project_id}{chr, nome del progetto GCP.}
 }
 \value{
-Scrive i dati su Postgres.
+?
 }
 \description{
-Funzione per l'inserimento di dati su POSTGRES.
+Funzione per l'inserimento di dati su Postgres.
 }

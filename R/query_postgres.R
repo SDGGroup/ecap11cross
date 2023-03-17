@@ -1,5 +1,5 @@
 #' query_postgres.R
-#' @description Funzione che esegue una query data in input in POSTGRES.
+#' @description Funzione che esegue una query data in input in Postgres.
 #' @param query chr, query da eseguire su Postgres.
 #' @returns Una tibble con il risultato della query. 
 #' @export

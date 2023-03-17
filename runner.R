@@ -3,30 +3,30 @@
 # CARICAMENTO LIBRERIE \ FILES --------------------------------------------
 rm(list=ls(all = TRUE)) 
 # Caricamento librerie necessarie per interagire con GCP
-library(bigrquery)           # funzioni di download\upload
-library(bigQueryR)           # funzioni di autenticazione: bqr_auth
-library(gargle)              # necessaria per l'autenticazione con la gcp
-library(googleCloudStorageR) # necessaria per l'upload dei file
+# library(bigrquery)           # funzioni di download\upload
+# library(bigQueryR)           # funzioni di autenticazione: bqr_auth
+# library(gargle)              # necessaria per l'autenticazione con la gcp
+# library(googleCloudStorageR) # necessaria per l'upload dei file
 
 # Caricamento librerie necessarie per interagire con Postgres
-library(RPostgres)   # libreria PostgreSql
-library(DBI)         # libreria gestione DataBase relazionali
-library(RPostgreSQL)
+# library(RPostgres)   # libreria PostgreSql
+# library(DBI)         # libreria gestione DataBase relazionali
+# library(RPostgreSQL)
 
 # Caricamento librerie cross processo
-library(readr)
-library(ini)
-library(logging)
-library(stringr)     # serve per str_replace_all
-library(glue)        # serve per leggere le stringhe parametrizzate del csv di DQ
+# library(readr)
+# library(ini)
+# library(logging)
+# library(stringr)     # serve per str_replace_all
+# library(glue)        # serve per leggere le stringhe parametrizzate del csv di DQ
 
 # Caricamento librerie specifiche per il processo
-library(dplyr)       # server per join, ecc ...
-library(lubridate)   # contiene floor_date
-#library(tidyverse)
-library(tidyr)
+# library(dplyr)       # server per join, ecc ...
+# library(lubridate)   # contiene floor_date
+# library(tidyverse)
+# library(tidyr)
 
-require(ecap11s6)
+# require(ecap11s6)
 require(ecap11cross)
 
 # CARICAMENTO SCRIPT -----------------------------------------------------------
@@ -119,7 +119,7 @@ code_status <- 'EXECUTED'
 
 
 # lettura file  config.ini (da testare con Airflow)
-config <- read.ini("/Users/emanuele_depaoli/dev/ecap11_irrbb_ecap/config/config.ini")
+config <- ini::read.ini("/Users/emanuele_depaoli/dev/ecap11_irrbb_ecap/config/config.ini")
 
 
 # Assegnazione variabili per leggere in GCP
@@ -236,9 +236,9 @@ if(lancio_interfaccia=='SI') {
 
 # CONNESSIONE BIGQUERY ---------------------------------------------------------
 
-bqr_auth()
-bqr_global_project(PROJECT_ID)
-client_projectId  = bqr_get_global_project()
+bigQueryR::bqr_auth()
+bigQueryR::bqr_global_project(PROJECT_ID)
+client_projectId  = bigQueryR::bqr_get_global_project()
 
 
 # DATA QUALITY -----------------------------------------------------------------
@@ -276,8 +276,8 @@ esito_global <- FALSE
 #### DQ1 ####
 #Verifica che tutti i COD_VALUTA_FINALE presenti in TE_IRRBB_NOTIONAL_EQUIVALENT 
 #siano anche presenti nel campo COD_VALUTA della tabella TE_IRRBB_CURVE_1Y
-
-esito <- do_DQ(check       = 1,
+debug(do_DQ)
+esito <- do_DQ(check       = "1", # TODO: attenzione check deve essere passato come chr! nella colonna in catalog è chr 
                catalog     = catalog,
                project_id  = PROJECT_ID,
                out_version = out_version,
@@ -287,3 +287,5 @@ if (esito) {out2log('ERRORE Data Quality 1 \n')}
 
 esito_global <- esito
 
+
+# scrivere "write_df_2_BQ"

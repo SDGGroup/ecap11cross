@@ -22,8 +22,9 @@
 retrieve_data_catalog <- function(cod_processo, catalog_table){
 
   query <- glue("SELECT * FROM {catalog_table} WHERE cod_processo='{cod_processo}'")
-  catalog <- query_postgres(query)
-  names(catalog) <- toupper(names(catalog))
+  catalog <- query_postgres(query) %>% 
+    rename_with(~ str_to_upper(.x), everything())
+
   return(catalog)
   
 }    

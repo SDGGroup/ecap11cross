@@ -1,12 +1,31 @@
 Package: ecap11cross
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Title: Pacchetto trasversale ecap11
+Version: 0.1.0
+Authors@R: c(
+   person("Anna", "Gianesini", , "anna.gianesini@intesanpaolo.com", role = c("aut", "cre")),
+   person("Anna", "Longari", , "anna.longari@sdggroup.com", role = c("aut")),
+   person("Andrea", "Spano", , "andrea.spano@sdggroup.com", role = c("aut")),
+   person("Anna", "Longari", , "anna.longari@sdggroup.com", role = c("aut")),
+   person("Emanuele", "Depaoli", , "emanuele.depaoli@sdggroup.com", role = c("aut")),
+   person("Pierluigi", "Giannuzzo", , "pierluigi.giannuzzo@intesanpaolo.com", role = c("ctb")),
+   person("Chiara", "Napione", , "chiara.napione@intesanpaolo.com", role = c("ctb")),
+   person("Federica", "Poma", , "federica.poma@intesanpaolo.com", role = c("ctb")))
+Description: Esegue alcune funzionalità trasversali a tutti gli step, tra cui
+    la data quality, tba ...
+License: privato
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
+Depends: 
+    R (>= 3.6.0)
+LazyData: true
+Imports:
+  dplyr,
+  tibble,
+  glue,
+  bigrquery,
+  DBI,
+  ini,
+  stringr
+Suggests:
+  roxygen2

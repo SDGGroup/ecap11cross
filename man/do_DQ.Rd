@@ -15,15 +15,13 @@ do_DQ(check, catalog, project_id, out_version, df_errors = NULL)
 
 \item{out_version}{int, versione dell'output}
 
-\item{df_error}{tibble con almeno 1 colonna: !!! TODO: aggiungere tipi !!!
+\item{df_error}{tibble con almeno 1 colonna:
 \itemize{
-\item OUTPUT1,
-\item OUTPUT2 opzionale,
-\item OUTPUT3 opzionale,
-\item CONTEGGIO opzionale.
+\item OUTPUT1 ?,
+\item OUTPUT2 ? opzionale,
+\item OUTPUT3 ? opzionale,
+\item CONTEGGIO ? opzionale.
 }}
-
-\item{y}{A number.}
 }
 \value{
 Un booleano. \code{TRUE} in presenza di errore nel controllo.

@@ -13,5 +13,5 @@ query_postgres(query)
 Una tibble con il risultato della query.
 }
 \description{
-Funzione che esegue una query data in input in POSTGRES.
+Funzione che esegue una query data in input in Postgres.
 }

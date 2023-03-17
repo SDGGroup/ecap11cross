@@ -1,5 +1,5 @@
 #' create_conn.R
-#' @description Crea una connessione a POSTEGRES.
+#' @description Crea una connessione a Postgres
 #' @returns Un S4 object ereditato da \link[DBI]{dbConnect}, usato per comunicare con il database. 
 #' @export
 

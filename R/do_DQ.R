@@ -8,17 +8,17 @@
 #' @param catalog tibble, contiene tutti controlli del processo.
 #' @param project_id chr, nome del progetto GCP
 #' @param out_version int, versione dell'output
-#' @param df_error tibble con almeno 1 colonna: !!! TODO: aggiungere tipi !!!
-#' * OUTPUT1,
-#' * OUTPUT2 opzionale,
-#' * OUTPUT3 opzionale,
-#' * CONTEGGIO opzionale.
-#' @param y A number.
+#' @param df_error tibble con almeno 1 colonna: 
+#' * OUTPUT1 ?,
+#' * OUTPUT2 ? opzionale,
+#' * OUTPUT3 ? opzionale,
+#' * CONTEGGIO ? opzionale.
 #' @returns Un booleano. `TRUE` in presenza di errore nel controllo.
 #' @export
 
 do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
-
+  
+  #TODO: aggiungere tipi di df_error nella documentazione !!!
   out2log("\n Diagnostico ",check," in esecuzione...")
 
   B          <- FALSE
@@ -31,12 +31,14 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
   if (is.null(df_errors)) {
 
     out2log('\n Controllo da query \n')
-    qry       <- glue(check_row$STMT_CONTROLLO)
+    qry       <- glue(check_row %>% 
+                        select(STMT_CONTROLLO) %>% 
+                        pull())
     out2log("\n ",qry)
 
     temp      <- bq_project_query(project_id, qry)
-    df_errors <- bq_table_do
-    wnload(temp)
+    df_errors <- bq_table_download(temp)
+    
   }
 
   # Casistica in cui non ho il conteggio (controllo di data quality ERROR)
@@ -45,33 +47,59 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
   # quindi la aggiungiamo in maniera fittizia
 
   if (check_row$COD_SEVERITA %in% c('ERROR') && nrow(df_errors) == 0) {
-    df_errors <- data.frame()
-    df_errors <- data.frame(output1 = c(NA), conteggio = c(1))
+    df_errors <- tibble()
+    df_errors <- tibble(output1 = NA_character_, 
+                        conteggio = 1)
   }
 
   conteggio_record_ko <- 0
-  conteggio_record    <- unique(df_errors$conteggio)
-  df_errors$conteggio <- NULL
+  conteggio_record    <- df_errors %>% 
+    select(conteggio) %>% 
+    distinct() %>% 
+    pull() 
+  df_errors <- df_errors %>% 
+    mutate(conteggio = NA_integer_)
 
   # Variabili di controllo esito scrittura su DataBase
   var_error <- FALSE     # Per BQ TA_DIAGNOSTICA
   uscita    <- FALSE     # Per Postgres te_esito_controllo_dq
-
-  if (!(is.na(df_errors$output1)[1]))
+  
+  first_output1 <- df_errors %>% 
+    select(output1) %>% 
+    slice(1) %>% 
+    pull()
+  
+  # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  # TODO: questa parte deve essere ancora testata e riscritta con tidyverse 
+  #       usando un possibile errore!!!!
+  if (!(is.na(first_output1)))
   {
 
     B <- TRUE
 
     # df_errors viene modificata per avere la struttura della TA_DIAGNOSTICA
     conteggio_record_ko       <- nrow(df_errors)
-    df_errors$COD_PROCESSO    <- check_row$COD_PROCESSO
-    df_errors$DAT_REPORT      <- dat_report
-    df_errors$ID_VERSIONE     <- as.integer(out_version)
-    df_errors$COD_SEVERITA    <- check_row$COD_SEVERITA
-    df_errors$COD_CONTROLLO	  <- check_row$COD_CONTROLLO
-    df_errors$DES_CONTROLLO	  <- check_row$DES_CONTROLLO
-    df_errors$DES_ESITO       <- check_row$MSG
-    df_errors$DAT_INSERIMENTO <- Sys.Date()
+    
+    df_errors <- df_errors %>% 
+      bind_cols(
+        check_row %>% 
+          select(COD_PROCESSO,
+                 COD_SEVERITA,
+                 COD_CONTROLLO,
+                 DES_CONTROLLO,
+                 c)
+      ) %>% 
+      mutate(DAT_REPORT      = dat_report,
+             ID_VERSIONE     = as.integer(out_version),
+             DAT_INSERIMENTO = Sys.Date(),
+             DES_ESITO       = c
+      ) %>% 
+      mutate(COD_PROCESSO  = check_row$COD_PROCESSO,
+             DAT_REPORT    = dat_report,
+             ID_VERSIONE   = as.integer(out_version),
+             COD_SEVERITA  = check_row$COD_SEVERITA,
+             COD_CONTROLLO = check_row$COD_CONTROLLO
+      )
 
     errori <- colnames(df_errors)
     if ("output1" %in% errori)
@@ -93,7 +121,7 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
     }
 
 
-    df_errors <- as.data.frame(df_errors)
+    df_errors <- tibble(df_errors)
 
     df_errors$DES_ESITO <- sapply(as.character(df_errors$DES_ESITO)  , function (x) glue(x))
 
@@ -147,6 +175,8 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
     out2log("\n Diagnostico ",check," eseguito\n\n")
 
   }
+  
+  # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
   if(var_error){
     out2log("\n Errore nella scrittura dell'esito controllo ", check, " in TA_DIAGNOSTICA \n")

@@ -276,7 +276,7 @@ esito_global <- FALSE
 #### DQ1 ####
 #Verifica che tutti i COD_VALUTA_FINALE presenti in TE_IRRBB_NOTIONAL_EQUIVALENT 
 #siano anche presenti nel campo COD_VALUTA della tabella TE_IRRBB_CURVE_1Y
-debug(do_DQ)
+
 esito <- do_DQ(check       = "1", # TODO: attenzione check deve essere passato come chr! nella colonna in catalog è chr 
                catalog     = catalog,
                project_id  = PROJECT_ID,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_conn.R
 \name{create_conn}
 \alias{create_conn}
-\title{create_conn.R}
+\title{create_conn}
 \usage{
 create_conn()
 }

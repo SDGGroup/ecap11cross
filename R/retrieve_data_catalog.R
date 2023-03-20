@@ -1,4 +1,4 @@
-#' retrieve_data_catalog.R
+#' retrieve_data_catalog
 #' @description Esegue il download dei controlli di data quality da Postgres in base al processo indicato.
 #' @param cod_processo chr, codice del processo per il quale sono richiesti i controlli.
 #' @param catalog_table tibble, tabella Postgres contenente i controlli di data quality.

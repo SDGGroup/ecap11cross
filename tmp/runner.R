@@ -273,12 +273,15 @@ if(data_quality_postgres=='SI')
 
 esito_global <- FALSE
 
-#### DQ1 ####
+### DQ1 ####
 #Verifica che tutti i COD_VALUTA_FINALE presenti in TE_IRRBB_NOTIONAL_EQUIVALENT 
 #siano anche presenti nel campo COD_VALUTA della tabella TE_IRRBB_CURVE_1Y
 
-esito <- do_DQ(check       = "1", # TODO: attenzione check deve essere passato come chr! nella colonna in catalog è chr 
-               catalog     = catalog,
+# modificato 5 con -2 al posto di -1
+catalog_error <- readr::read_delim("tmp/config/data_quality_catalog.csv", ";", escape_double = FALSE, trim_ws = TRUE) 
+debug(do_DQ)
+esito <- do_DQ(check       = "5", # TODO: attenzione check deve essere passato come chr! nella colonna in catalog è chr 
+               catalog     = catalog_error,
                project_id  = PROJECT_ID,
                out_version = out_version,
                df_errors   = NULL)
@@ -287,5 +290,3 @@ if (esito) {out2log('ERRORE Data Quality 1 \n')}
 
 esito_global <- esito
 
-
-# scrivere "write_df_2_BQ"

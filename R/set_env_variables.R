@@ -1,4 +1,4 @@
-#' load_environment.R
+#' load_environment
 #' @description Crea le variabili d'ambiente per VM e Airflow. 
 #' @export
 load_environment <- function(){
@@ -9,7 +9,7 @@ load_environment <- function(){
   Sys.setenv(password_postgres = 'dcerm_app')
 }
 
-#' load_environment_local.R
+#' load_environment_local
 #' @description Crea le variabili d'ambiente per per PC locale. 
 #' @export
 load_environment_local <- function(){

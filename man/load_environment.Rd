@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_env_variables.R
 \name{load_environment}
 \alias{load_environment}
-\title{load_environment.R}
+\title{load_environment}
 \usage{
 load_environment()
 }

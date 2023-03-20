@@ -2,7 +2,7 @@
 % Please edit documentation in R/query_postgres.R
 \name{query_postgres}
 \alias{query_postgres}
-\title{query_postgres.R}
+\title{query_postgres}
 \usage{
 query_postgres(query)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{out2log_airflow}
 \alias{out2log_airflow}
-\title{out2log_airflow.R}
+\title{out2log_airflow}
 \usage{
 out2log_airflow(...)
 }

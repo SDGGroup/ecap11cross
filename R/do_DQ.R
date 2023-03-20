@@ -1,4 +1,4 @@
-#' do_DQ.R
+#' do_DQ
 #' @description Esegue il controllo corrispondente a `COD_CONTROLLO`.
 #' Ci sono due possibilità:
 #' * controllo tramite query. `catalog` deve avere popolato il campo `STMT_CONTROLLO` 
@@ -69,11 +69,7 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
     slice(1) %>% 
     pull()
   
-  # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  # TODO: questa parte deve essere ancora testata e riscritta con tidyverse 
-  #       usando un possibile errore!!!!
-  if (!(is.na(first_output1)))
-  {
+  if (!(is.na(first_output1))) {
 
     B <- TRUE
 
@@ -87,44 +83,31 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
                  COD_SEVERITA,
                  COD_CONTROLLO,
                  DES_CONTROLLO,
-                 c)
+                 MSG)
       ) %>% 
       mutate(DAT_REPORT      = dat_report,
              ID_VERSIONE     = as.integer(out_version),
              DAT_INSERIMENTO = Sys.Date(),
-             DES_ESITO       = c
-      ) %>% 
-      mutate(COD_PROCESSO  = check_row$COD_PROCESSO,
-             DAT_REPORT    = dat_report,
-             ID_VERSIONE   = as.integer(out_version),
-             COD_SEVERITA  = check_row$COD_SEVERITA,
-             COD_CONTROLLO = check_row$COD_CONTROLLO
-      )
+             DES_ESITO       = MSG
+      ) 
 
     errori <- colnames(df_errors)
-    if ("output1" %in% errori)
-    {
+    if ("output1" %in% errori) {
       df_errors$DES_ESITO <- str_replace_all(df_errors$DES_ESITO, '\\{output1\\}',
                                              as.character(df_errors$output1))
     }
 
-    if ("output2" %in% errori)
-    {
+    if ("output2" %in% errori) {
       df_errors$DES_ESITO <- str_replace_all(df_errors$DES_ESITO, '\\{output2\\}',
                                              as.character(df_errors$output2))
     }
 
-    if ("output3" %in% errori)
-    {
+    if ("output3" %in% errori) {
       df_errors$DES_ESITO <- str_replace_all(df_errors$DES_ESITO, '\\{output3\\}',
                                              as.character(df_errors$output3))
     }
 
-
-    df_errors <- tibble(df_errors)
-
     df_errors$DES_ESITO <- sapply(as.character(df_errors$DES_ESITO)  , function (x) glue(x))
-
 
     #eliminiamo se ci sono, le colonne che non sono richieste dalla tabella TE_DIAGNOSTICA
 
@@ -141,30 +124,24 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
 
 
     tms_fine <- now()
+    
     # in caso di cod_severita = WARNING viene aggiornata anche la tabella Postgres
-    if (check_row$COD_SEVERITA %in% c('WARNING'))
-    {
-      # crea il dataframe vuoto da scrivere su Postgres
-      df_postgres <- data.frame(matrix(ncol = 12,nrow = 1,
-                                       dimnames=list(NULL, c("dat_report", "num_versione", "cod_processo",
-                                                             "cod_controllo","des_controllo","cod_esito",
-                                                             "dat_inserimento","num_tot_casi","num_tot_casi_warn",
-                                                             "num_tot_casi_error","tms_inizio","tms_fine")))
+    if (check_row$COD_SEVERITA %in% c('WARNING')) {
+      
+      # crea il dataframe da scrivere su Postgres
+      df_postgres <- tibble(dat_report = dat_report,
+                            num_versione = as.integer(out_version),
+                            cod_processo = check_row$COD_PROCESSO,
+                            cod_controllo = check_row$COD_CONTROLLO,
+                            des_controllo =  check_row$DES_CONTROLLO,
+                            cod_esito = (if(var_error){'ERROR'} else if(B){'KO'} else {'OK'}),
+                            dat_inserimento = dat_report,
+                            num_tot_casi = conteggio_record,
+                            num_tot_casi_warn =  (if(check_row$COD_SEVERITA == 'ERROR'){0} else {conteggio_record_ko}),
+                            num_tot_casi_error = (if(check_row$COD_SEVERITA == 'ERROR'){conteggio_record_ko} else {0}),
+                            tms_inizio = tms_inizio,
+                            tms_fine = tms_fine
       )
-      # popola il dataframe da scrivere su Postgres
-
-      df_postgres$dat_report          <- dat_report
-      df_postgres$num_versione        <- as.integer(out_version)
-      df_postgres$cod_processo        <- check_row$COD_PROCESSO
-      df_postgres$cod_controllo       <- check_row$COD_CONTROLLO
-      df_postgres$des_controllo       <- check_row$DES_CONTROLLO
-      df_postgres$cod_esito           <- (if(var_error){'ERROR'} else if(B){'KO'} else {'OK'})
-      df_postgres$dat_inserimento	    <- dat_report
-      df_postgres$num_tot_casi	      <- conteggio_record
-      df_postgres$num_tot_casi_warn	  <- (if(check_row$COD_SEVERITA == 'ERROR'){0} else {conteggio_record_ko})
-      df_postgres$num_tot_casi_error	<- (if(check_row$COD_SEVERITA == 'ERROR'){conteggio_record_ko} else {0})
-      df_postgres$tms_inizio	        <- tms_inizio
-      df_postgres$tms_fine	          <- tms_fine
 
       # scrive il dataframe su Postgres
       tryCatch({write_df_on_postgres(nome_tabella = 'te_esito_controllo_dq',
@@ -175,14 +152,12 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors=NULL) {
     out2log("\n Diagnostico ",check," eseguito\n\n")
 
   }
-  
-  # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-  if(var_error){
+  if (var_error) {
     out2log("\n Errore nella scrittura dell'esito controllo ", check, " in TA_DIAGNOSTICA \n")
   }
 
-  if(uscita){
+  if (uscita) {
     out2log("\n Errore nella scrittura dell'esito controllo ", check, " in te_esito_controllo_dq \n")
   }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/do_DQ.R
 \name{do_DQ}
 \alias{do_DQ}
-\title{do_DQ.R}
+\title{do_DQ}
 \usage{
 do_DQ(check, catalog, project_id, out_version, df_errors = NULL)
 }

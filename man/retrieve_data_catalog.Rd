@@ -2,7 +2,7 @@
 % Please edit documentation in R/retrieve_data_catalog.R
 \name{retrieve_data_catalog}
 \alias{retrieve_data_catalog}
-\title{retrieve_data_catalog.R}
+\title{retrieve_data_catalog}
 \usage{
 retrieve_data_catalog(cod_processo, catalog_table)
 }

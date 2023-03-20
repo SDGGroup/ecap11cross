@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{out2log_local}
 \alias{out2log_local}
-\title{out2log_local.R}
+\title{out2log_local}
 \usage{
 out2log_local(...)
 }

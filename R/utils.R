@@ -1,4 +1,4 @@
-#' out2log_local.R
+#' out2log_local
 #' @description Usa \link[base]{cat} per scrivere messaggi su stdout, così da essere utile in run locali.
 #' @export
 
@@ -12,7 +12,7 @@ out2log_local <- function(...) {
 }
 
 
-#' out2log_airflow.R
+#' out2log_airflow
 #' @description Usa \link[base]{cat} per scrivere messaggi su stderr, così che anche airflow li mostri.
 #' @export
 

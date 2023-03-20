@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_env_variables.R
 \name{load_environment_local}
 \alias{load_environment_local}
-\title{load_environment_local.R}
+\title{load_environment_local}
 \usage{
 load_environment_local()
 }

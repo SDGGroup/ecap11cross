@@ -22,9 +22,12 @@ LazyData: true
 Imports:
   dplyr,
   tibble,
+  lubridate,
   glue,
   bigrquery,
+  bigQueryR,
   DBI,
+  RPostgres,
   ini,
   stringr
 Suggests:

@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_df_on_postgres.R
 \name{write_df_on_postgres}
 \alias{write_df_on_postgres}
-\title{write_df_on_postgres.R}
+\title{write_df_on_postgres}
 \usage{
 write_df_on_postgres(nome_tabella, oggetto)
 }

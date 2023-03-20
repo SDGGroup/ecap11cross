@@ -1,4 +1,4 @@
-#' write_df_on_postgres.R
+#' write_df_on_postgres
 #' @description Funzione per l'inserimento di dati su Postgres.
 #' @param nome_tabella chr, nome tabella Postgres di destinazione.
 #' @param oggetto tibble, oggetto da scrivere.

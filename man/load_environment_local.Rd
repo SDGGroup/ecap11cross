@@ -7,5 +7,5 @@
 load_environment_local()
 }
 \description{
-Crea le variabili d'ambiente per per PC locale.
+Crea le variabili d'ambiente per per PC locale
 }

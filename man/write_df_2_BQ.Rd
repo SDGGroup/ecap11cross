@@ -7,20 +7,17 @@
 write_df_2_BQ(project_id, dataframe, dataset, tabella, tab_schema = NULL)
 }
 \arguments{
-\item{project_id}{chr, progetto contenente la base dati sorgente.}
+\item{project_id}{\code{chr} progetto contenente la base dati sorgente}
 
-\item{dataframe}{tibble, dataframe da scrivere.}
+\item{dataframe}{\code{tibble} dataframe da scrivere}
 
-\item{dataset}{chr, dataset di destinazione.}
+\item{dataset}{\code{chr} dataset di destinazione}
 
-\item{tabella}{chr, tabella di destinazione}
+\item{tabella}{\code{chr} tabella di destinazione}
 
-\item{tab_schema}{list, lista con la stessa struttura dell'output schema_fields.
-Se non specificato valore di default nullo e viene eseguito l'if.}
-}
-\value{
-?
+\item{tab_schema}{\code{list} lista con la stessa struttura dell'output schema_fields.
+Se non specificato valore di default nullo e viene eseguito l'if}
 }
 \description{
-Funzione per l'inserimento di dati su BIGQUERY.
+Funzione per l'inserimento di dati su BIGQUERY
 }

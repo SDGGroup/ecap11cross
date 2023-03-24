@@ -7,5 +7,5 @@
 out2log_local(...)
 }
 \description{
-Usa \link[base]{cat} per scrivere messaggi su stdout, così da essere utile in run locali.
+Usa \link[base]{cat} per scrivere messaggi su stdout, così da essere utile in run locali
 }

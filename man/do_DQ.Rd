@@ -7,31 +7,46 @@
 do_DQ(check, catalog, project_id, out_version, df_errors = NULL)
 }
 \arguments{
-\item{check}{chr, codice controllo da eseguire.}
+\item{check}{\code{chr} codice controllo da eseguire}
 
-\item{catalog}{tibble, contiene tutti controlli del processo.}
-
-\item{project_id}{chr, nome del progetto GCP}
-
-\item{out_version}{int, versione dell'output}
-
-\item{df_error}{tibble con almeno 1 colonna:
+\item{catalog}{\code{tibble} contiene tutti controlli del processo:
 \itemize{
-\item OUTPUT1 ?,
-\item OUTPUT2 ? opzionale,
-\item OUTPUT3 ? opzionale,
-\item CONTEGGIO ? opzionale.
+\item COD_CONTROLLO \code{chr}
+\item COD_PROCESSO \code{chr}
+\item COD_TIPO_CONTROLLO \code{int}
+\item COD_FREQ_CONTROLLO \code{chr}
+\item COD_SEVERITA \code{chr}
+\item DES_CONTROLLO \code{chr}
+\item MSG \code{chr}
+\item STMT_CONTROLLO \code{chr}
+\item FLG_ATTIVO \code{chr}
+\item TMS_CREAZIONE ?
+\item TMS_MODIFICA ?
+\item DAT_FINE_VALIDITA ?
+\item COD_UTENTE_MODIFICA ?
+\item COD_UTENTE_CREAZIONE ?
+}}
+
+\item{project_id}{\code{chr} nome del progetto GCP}
+
+\item{out_version}{\code{int} versione dell'output}
+
+\item{df_error}{\code{tibble}:
+\itemize{
+\item OUTPUT1 ?
+\item OUTPUT2 ?
+\item OUTPUT3 ?
+\item CONTEGGIO ?
 }}
 }
 \value{
-Un booleano. \code{TRUE} in presenza di errore nel controllo.
+\code{bool} \code{TRUE} in presenza di errore nel controllo
 }
 \description{
-Esegue il controllo corrispondente a \code{COD_CONTROLLO}.
-Ci sono due possibilità:
+Esegue il controllo corrispondente a \code{COD_CONTROLLO}. Ci sono due possibilità:
 \itemize{
 \item controllo tramite query. \code{catalog} deve avere popolato il campo \code{STMT_CONTROLLO}
-con la query che verrà utilizzata per il controllo e \code{df_errors=NULL}.
-\item controllo diretto se \code{df_error} è passato come argomento.
+con la query che verrà utilizzata per il controllo e \code{df_errors=NULL}
+\item controllo diretto se \code{df_error} è passato come argomento
 }
 }

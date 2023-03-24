@@ -5,17 +5,28 @@
 #' * controllo diretto se `df_error` è passato come argomento
 #' @param check `chr` codice controllo da eseguire
 #' @param catalog `tibble` contiene tutti controlli del processo:
-#' * tba
-#' * tba
-#' * tba
+#' * COD_CONTROLLO `chr`
+#' * COD_PROCESSO `chr`
+#' * COD_TIPO_CONTROLLO `int`
+#' * COD_FREQ_CONTROLLO `chr`
+#' * COD_SEVERITA `chr`
+#' * DES_CONTROLLO `chr`
+#' * MSG `chr`
+#' * STMT_CONTROLLO `chr`
+#' * FLG_ATTIVO `chr`
+#' * TMS_CREAZIONE ?
+#' * TMS_MODIFICA ?
+#' * DAT_FINE_VALIDITA ?
+#' * COD_UTENTE_MODIFICA ?
+#' * COD_UTENTE_CREAZIONE ?
 #' @param project_id `chr` nome del progetto GCP
 #' @param out_version `int` versione dell'output
 #' @param df_error `tibble`:
-#' * OUTPUT1 ?,
-#' * OUTPUT2 ? opzionale,
-#' * OUTPUT3 ? opzionale,
-#' * CONTEGGIO ? opzionale.
-#' @returns `bool`  `TRUE` in presenza di errore nel controllo
+#' * OUTPUT1 ?
+#' * OUTPUT2 ? 
+#' * OUTPUT3 ?
+#' * CONTEGGIO ? 
+#' @returns `bool` `TRUE` in presenza di errore nel controllo
 #' @export
 
 do_DQ <- function(check, catalog, project_id, out_version, df_errors = NULL) {

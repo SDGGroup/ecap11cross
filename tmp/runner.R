@@ -279,9 +279,9 @@ esito_global <- FALSE
 
 # modificato 5 con -2 al posto di -1
 catalog_error <- readr::read_delim("tmp/config/data_quality_catalog.csv", ";", escape_double = FALSE, trim_ws = TRUE) 
-debug(do_DQ)
+
 esito <- do_DQ(check       = "5", # TODO: attenzione check deve essere passato come chr! nella colonna in catalog è chr 
-               catalog     = catalog_error,
+               catalog     = catalog,
                project_id  = PROJECT_ID,
                out_version = out_version,
                df_errors   = NULL)

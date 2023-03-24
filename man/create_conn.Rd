@@ -7,7 +7,7 @@
 create_conn()
 }
 \value{
-Un S4 object ereditato da \link[DBI]{dbConnect}, usato per comunicare con il database.
+Un S4 object ereditato da \link[DBI]{dbConnect}, usato per comunicare con il database
 }
 \description{
 Crea una connessione a Postgres

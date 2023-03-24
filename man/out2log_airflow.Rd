@@ -7,5 +7,5 @@
 out2log_airflow(...)
 }
 \description{
-Usa \link[base]{cat} per scrivere messaggi su stderr, così che anche airflow li mostri.
+Usa \link[base]{cat} per scrivere messaggi su stderr, così che anche airflow li mostri
 }

@@ -7,15 +7,15 @@
 write_df_on_postgres(nome_tabella, oggetto)
 }
 \arguments{
-\item{nome_tabella}{chr, nome tabella Postgres di destinazione.}
+\item{nome_tabella}{\code{chr} nome tabella Postgres di destinazione}
 
-\item{oggetto}{tibble, oggetto da scrivere.}
+\item{oggetto}{\code{tibble} oggetto da scrivere}
 
-\item{project_id}{chr, nome del progetto GCP.}
+\item{project_id}{\code{chr} nome del progetto GCP}
 }
 \value{
-?
+\code{bool} TRUE, invisibilmente.
 }
 \description{
-Funzione per l'inserimento di dati su Postgres.
+Funzione per l'inserimento di dati su Postgres
 }

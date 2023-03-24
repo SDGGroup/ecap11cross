@@ -7,30 +7,30 @@
 retrieve_data_catalog(cod_processo, catalog_table)
 }
 \arguments{
-\item{cod_processo}{chr, codice del processo per il quale sono richiesti i controlli.}
+\item{cod_processo}{\code{chr} codice del processo per il quale sono richiesti i controlli}
 
-\item{catalog_table}{tibble, tabella Postgres contenente i controlli di data quality.}
+\item{catalog_table}{\code{chr} nome tabella Postgres contenente i controlli di data quality}
 
-\item{project_id}{chr, nome del progetto GCP.}
+\item{project_id}{\code{chr} nome del progetto GCP}
 }
 \value{
-Una tibble con 13 colonne:
+\code{tibble}:
 \itemize{
-\item COD_CONTROLLO  chr,
-\item COD_PROCESSO chr,
-\item COD_TIPO_CONTROLLO chr,
-\item COD_FREQ_CONTROLLO chr,
-\item COD_SEVERITA chr,
-\item DES_CONTROLLO chr,
-\item MSG chr,
-\item STMT_CONTROLLO chr,
-\item FLG_ATTIVO chr,
-\item TMS_CREAZIONE ?,
-\item DAT_FINE_VALIDITA ?,
-\item COD_UTENTE_MODIFICA ?,
-\item COD_UTENTE_CREAZIONE chr.
+\item COD_CONTROLLO  \code{chr}
+\item COD_PROCESSO \code{chr}
+\item COD_TIPO_CONTROLLO \code{chr}
+\item COD_FREQ_CONTROLLO \code{chr}
+\item COD_SEVERITA \code{chr}
+\item DES_CONTROLLO \code{chr}
+\item MSG \code{chr}
+\item STMT_CONTROLLO \code{chr}
+\item FLG_ATTIVO \code{chr}
+\item TMS_CREAZIONE ?
+\item DAT_FINE_VALIDITA ?
+\item COD_UTENTE_MODIFICA ?
+\item COD_UTENTE_CREAZIONE \code{chr}
 }
 }
 \description{
-Esegue il download dei controlli di data quality da Postgres in base al processo indicato.
+Esegue il download dei controlli di data quality da Postgres in base al processo indicato
 }

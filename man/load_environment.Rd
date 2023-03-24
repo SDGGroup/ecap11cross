@@ -7,5 +7,5 @@
 load_environment()
 }
 \description{
-Crea le variabili d'ambiente per VM e Airflow.
+Crea le variabili d'ambiente per VM e Airflow
 }

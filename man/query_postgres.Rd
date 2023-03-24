@@ -7,11 +7,11 @@
 query_postgres(query)
 }
 \arguments{
-\item{query}{chr, query da eseguire su Postgres.}
+\item{query}{\code{chr} query da eseguire su Postgres.}
 }
 \value{
-Una tibble con il risultato della query.
+\code{tibble}
 }
 \description{
-Funzione che esegue una query data in input in Postgres.
+Funzione che esegue una query data in input in Postgres
 }

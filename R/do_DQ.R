@@ -33,6 +33,7 @@ do_DQ <- function(check, catalog, project_id, out_version, df_errors = NULL) {
 
   #TODO: aggiungere tipi e colonne di df_error nella documentazione
   #TODO: aggiungere colonne e tipi di catalog
+  
   out2log("\n Diagnostico ",check," in esecuzione...")
 
   B          <- FALSE

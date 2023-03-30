@@ -2,46 +2,7 @@
 
 # CARICAMENTO LIBRERIE \ FILES --------------------------------------------
 rm(list=ls(all = TRUE)) 
-# Caricamento librerie necessarie per interagire con GCP
-# library(bigrquery)           # funzioni di download\upload
-# library(bigQueryR)           # funzioni di autenticazione: bqr_auth
-# library(gargle)              # necessaria per l'autenticazione con la gcp
-# library(googleCloudStorageR) # necessaria per l'upload dei file
-
-# Caricamento librerie necessarie per interagire con Postgres
-# library(RPostgres)   # libreria PostgreSql
-# library(DBI)         # libreria gestione DataBase relazionali
-# library(RPostgreSQL)
-
-# Caricamento librerie cross processo
-# library(readr)
-# library(ini)
-# library(logging)
-# library(stringr)     # serve per str_replace_all
-# library(glue)        # serve per leggere le stringhe parametrizzate del csv di DQ
-
-# Caricamento librerie specifiche per il processo
-# library(dplyr)       # server per join, ecc ...
-# library(lubridate)   # contiene floor_date
-# library(tidyverse)
-# library(tidyr)
-
-# require(ecap11s6)
 require(ecap11cross)
-
-# CARICAMENTO SCRIPT -----------------------------------------------------------
-
-# Caricamento funzioni cross processi. Necessario definire il path "code/..."
-# source("code/data_quality.R")
-# source("code/input.R")
-# source("code/output.R")
-# source("code/utils.R")
-# source("code/check_interfaccia.R")           # contiene la funzione che esegue i controlli da interfaccia
-# source("code/set_env_variables.R")
-
-# Caricamento funzioni specifiche del processo 
-
-
 
 # GESTIONE LANCIO --------------------------------------------------------------
 
@@ -119,11 +80,11 @@ code_status <- 'EXECUTED'
 
 
 # lettura file  config.ini (da testare con Airflow)
-config <- ini::read.ini("/Users/emanuele_depaoli/dev/ecap11_irrbb_ecap/config/config.ini")
-
+config <- ini::read.ini("/Users/emanuele_depaoli/dev/ecap11_irrbb_notional_equivalent/config/config.ini")
 
 # Assegnazione variabili per leggere in GCP
-PROJECT_ID         <- config$GCP$project_id 
+PROJECT_ID         <- config$GCP$project_id
+PROJECT_ID_FEEDING <- config$GCP$project_id_feeding
 COD_PROCESSO       <- config$GCP$cod_processo
 DATASET_GENERAL    <- config$GCP$dataset_general
 DATASET_ECAP       <- config$GCP$dataset_ecap
@@ -138,20 +99,19 @@ TAB_DIAGNOSTICA    <- config$BQ_TABLES$diagnostica
 # Postgres
 CATALOG_TABLE      <- config$POSTGRESQL_TABLES$catalog_table
 
-
 # Assegnazione variabili (nomi tabelle) specifiche
 
 # Input
-CURVE_1Y                 <- config$BQ_TABLES$curve_1y
-NOTIONAL_EQUIVALENT      <- config$BQ_TABLES$notional_equivalent
-NOTIONAL_EQUIVALENT_BASE <- config$BQ_TABLES$notional_equivalent_base
-SHOCK_EFFETTIVI          <- config$BQ_TABLES$shock_effettivi
-MAPPING_ENTITY           <- config$BQ_TABLES$mapping_entity
+SHIFT_SENSITIVITY      <- config$BQ_TABLES$shift_sensitivity
+SHIFT_SENSITIVITY_BASE <- config$BQ_TABLES$shift_sensitivity_base
+DISCOUNT_FACTOR        <- config$BQ_TABLES$discount_factor
+MAPPING_DES_SHOCK      <- config$BQ_TABLES$mapping_des_shock
+MAPPING_CURRENCY       <- config$BQ_TABLES$mapping_currency
 
 # Output
-ECAP      <- config$BQ_TABLES$ecap
-CURVE_VAR <- config$BQ_TABLES$curve_var
-DELTA_PV  <- config$BQ_TABLES$delta_pv
+NOTIONAL      <- config$BQ_TABLES$notional_equivalent
+NOTIONAL_BASE <- config$BQ_TABLES$notional_equivalent_base
+SHOCK_EFFETTIVI <- config$BQ_TABLES$shock_effettivi
 
 # CARICAMENTO VARIABILI AMBIENTE -----------------------------------------------
 
@@ -168,6 +128,7 @@ if(lancio_interfaccia != 'SI'){
     load_environment() 
   }
 }
+
 # i nomi di queste variabili devono coincidere (anche maiuscolo\minuscolo)
 # con quelli utilizzati nella funzione code/input.R::retrieve_data_catalog()
 DBNAME_POSTGRES   <- Sys.getenv('dbname_postgres')
@@ -179,60 +140,62 @@ PASSWORD_POSTGRES <- Sys.getenv('password_postgres')
 
 # RICHIAMO DEI PARAMETRI POSTGRES ----------------------------------------------
 
-out2log('Richiamo parametri da PostGres \n')
+ut2log('Richiamo parametri da PostGres \n')
 
 # Funzione di connessione a Postgres per il richiamo dei parametri inseriti da interfaccia 
 # i parametri recuperati da Postgres sono relativi sia ai parametri del modello che alle versioni delle tabelle
 
-if(lancio_interfaccia=='SI') {
+if(lancio_interfaccia=='SI'){
   
-  params                            <- retrieve_params(id_elaborazione)
-  secondo_percentile                <- as.double(params[params$param_nome == 'secondo_percentile',]$param_value)
-  scenario_no_prepayment            <- '+100' #params[params$param_nome == 'scenario_no_prepayment',]$param_value #TODO
-  prepayment                        <- params[params$param_nome == 'prepayment',]$param_value
-  mesi_tenor_prepayment             <- params[params$param_nome == 'mesi_tenor_prepayment',]$param_value
-  formula_delta_pv                  <- params[params$param_nome == 'formula_delta_pv',]$param_value
-  storicizza_delta_pv               <- params[params$param_nome == 'storicizza_delta_pv',]$param_value
-  versione_curve_1y                 <- params[params$param_nome == CURVE_1Y,]$param_value 
-  versione_notional_equivalent      <- params[params$param_nome == NOTIONAL_EQUIVALENT,]$param_value 
-  versione_notional_equivalent_base <- params[params$param_nome == NOTIONAL_EQUIVALENT_BASE,]$param_value
-  versione_shock_effettivi          <- params[params$param_nome == SHOCK_EFFETTIVI,]$param_value 
-  versione_mapping_entity           <- params[params$param_nome == MAPPING_ENTITY,]$param_value 
+  params <- retrieve_params(id_elaborazione)
+  caricamento_shift_sensitivity   <- params[params$param_nome == 'caricamento_shift_sensitivity',]$param_value
+  caricamento_discount_factor     <- params[params$param_nome == 'caricamento_discount_factor',]$param_value
+  versione_shift_sensitivity      <- params[params$param_nome == SHIFT_SENSITIVITY,]$param_value
+  if(!is.na(params[params$param_nome == SHIFT_SENSITIVITY_BASE,])){
+    versione_shift_sensitivity_base <- params[params$param_nome == SHIFT_SENSITIVITY_BASE,]$param_value
+  } else {versione_shift_sensitivity_base <- NA}
+  versione_discount_factor        <- params[params$param_nome == DISCOUNT_FACTOR,]$param_value
+  versione_mapping_des_shock      <- params[params$param_nome == MAPPING_DES_SHOCK,]$param_value
+  versione_mapping_currency       <- params[params$param_nome == MAPPING_CURRENCY,]$param_value
+  
 } else {
   
   if(recupero_param_postgres == 'SI'){
     
-    params                            <- retrieve_params(id_elaborazione)
-    secondo_percentile                <- as.double(params[params$param_nome == 'secondo_percentile',]$param_value)
-    scenario_no_prepayment            <- '+100' #params[params$param_nome == 'scenario_no_prepayment',]$param_value #TODO
-    prepayment                        <- params[params$param_nome == 'prepayment',]$param_value
-    mesi_tenor_prepayment             <- params[params$param_nome == 'mesi_tenor_prepayment',]$param_value
-    formula_delta_pv                  <- params[params$param_nome == 'formula_delta_pv',]$param_value
-    storicizza_delta_pv               <- params[params$param_nome == 'storicizza_delta_pv',]$param_value
-    versione_curve_1y                 <- params[params$param_nome == CURVE_1Y,]$param_value 
-    versione_notional_equivalent      <- params[params$param_nome == NOTIONAL_EQUIVALENT,]$param_value 
-    versione_notional_equivalent_base <- params[params$param_nome == NOTIONAL_EQUIVALENT_BASE,]$param_value
-    versione_shock_effettivi          <- params[params$param_nome == SHOCK_EFFETTIVI,]$param_value 
-    versione_mapping_entity           <- params[params$param_nome == MAPPING_ENTITY,]$param_value 
+    params <- retrieve_params(id_elaborazione)
+    caricamento_shift_sensitivity   <- params[params$param_nome == 'caricamento_shift_sensitivity',]$param_value
+    caricamento_discount_factor     <- params[params$param_nome == 'caricamento_discount_factor',]$param_value
+    versione_shift_sensitivity      <- params[params$param_nome == SHIFT_SENSITIVITY,]$param_value
+    if(!is.na(params[params$param_nome == SHIFT_SENSITIVITY_BASE,])){
+      versione_shift_sensitivity_base <- params[params$param_nome == SHIFT_SENSITIVITY_BASE,]$param_value
+    } else {versione_shift_sensitivity_base <- NA}
+    versione_discount_factor        <- params[params$param_nome == DISCOUNT_FACTOR,]$param_value
+    versione_mapping_des_shock      <- params[params$param_nome == MAPPING_DES_SHOCK,]$param_value
+    versione_mapping_currency       <- params[params$param_nome == MAPPING_CURRENCY,]$param_value
+    
   } else{
     
     # Setting manuale 
     # Parametri specifici della procedura
-    secondo_percentile     <- 0.96
-    scenario_no_prepayment <- '+100'
-    prepayment             <- 'SI'
-    mesi_tenor_prepayment  <- 180
-    formula_delta_pv       <- 'GESTIONALE' # GESTIONALE/SEGNALETICA
-    storicizza_delta_pv    <- 'NO'
+    caricamento_shift_sensitivity <- 'FEEDING_AUTOMATICO' #'CARICAMENTO_MANUALE' # 'CARICAMENTO_MANUALE' #o FEEDING_AUTOMATICO
+    caricamento_discount_factor   <- 'CARICAMENTO_MANUALE'
     
     # versioni lancio sviluppo
-    versione_curve_1y                 <- 1      
-    versione_notional_equivalent      <- 18
-    versione_notional_equivalent_base <- 18
-    versione_shock_effettivi          <- 18
-    versione_mapping_entity           <- 1
+    versione_shift_sensitivity      <- 0#1
+    versione_shift_sensitivity_base <- 3
+    versione_discount_factor        <- 1
+    versione_mapping_des_shock      <- 1
+    versione_mapping_currency       <- 1
   }
 }
+
+
+if(caricamento_shift_sensitivity == 'CARICAMENTO_MANUALE'){
+  PROJECT_ID_SHIFT = PROJECT_ID
+} else{ PROJECT_ID_SHIFT = PROJECT_ID_FEEDING }
+if(caricamento_discount_factor == 'CARICAMENTO_MANUALE'){
+  PROJECT_ID_DISCOUNT = PROJECT_ID
+} else{ PROJECT_ID_DISCOUNT = PROJECT_ID_FEEDING }
 
 # CONNESSIONE BIGQUERY ---------------------------------------------------------
 
@@ -247,7 +210,7 @@ out2log('Inizio Data Quality Propedeutico\n')               # Inizio DQ antecede
 
 # Download  dei controlli di Data Quality 
 
-if(data_quality_postgres=='SI')
+if(data_quality_postgres == 'SI')
 {
   # Download da Postgres 
   catalog <- retrieve_data_catalog(COD_PROCESSO, CATALOG_TABLE)
@@ -277,11 +240,11 @@ esito_global <- FALSE
 #Verifica che tutti i COD_VALUTA_FINALE presenti in TE_IRRBB_NOTIONAL_EQUIVALENT 
 #siano anche presenti nel campo COD_VALUTA della tabella TE_IRRBB_CURVE_1Y
 
-# modificato 5 con -2 al posto di -1
+# modificato 5 >= 1 al posto di >
 catalog_error <- readr::read_delim("tmp/config/data_quality_catalog.csv", ";", escape_double = FALSE, trim_ws = TRUE) 
 
 esito <- do_DQ(check       = "5", # TODO: attenzione check deve essere passato come chr! nella colonna in catalog è chr 
-               catalog     = catalog,
+               catalog     = catalog_error,
                project_id  = PROJECT_ID,
                out_version = out_version,
                df_errors   = NULL)

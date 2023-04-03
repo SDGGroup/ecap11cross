@@ -14,6 +14,21 @@ connect2bq <- function(.project_id, .dataset){
   return(con)
 }
 
+# funzione per connettersi a postgres
+connect2postgres <- function(){
+  
+  con <- dbConnect(
+    RPostgres::Postgres(), 
+    host = '100.125.240.3',
+    port = '5432',
+    dbname ='ddl-dcerm-db',
+    user = "ddl_dcerm_app",
+    password = "dcerm_app"
+  )
+  
+  return(con)
+}
+
 # funzione per scrivere df su bq
 writedf2bq <- function(.project_id, 
                        .dataframe, 
@@ -46,6 +61,15 @@ writedf2bq <- function(.project_id,
                   schema            = tab_schema)
   
 }
+
+writedf2postgres <- function(.nome_tabella, .oggetto){
+  
+  con <- connect2postgres()
+  result <- dbWriteTable(con, .nome_tabella, .oggetto, append = TRUE)
+  dbDisconnect(con)
+  
+}
+
 
 # funzione che modifica df_errors per avere la struttura della TA_DIAGNOSTICA
 mutate_dferrors <- function(.df_errors, 

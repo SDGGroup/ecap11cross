@@ -90,6 +90,24 @@ do_dq(dq_5error,
       dataset_general,
       tab_diagnostica)
 
+# DQ 5 error - cod_severita WARNING
+do_dq(dq_5error,
+      project_id, 
+      dataset,
+      dat_report,
+      out_version,
+      cod_processo, 
+      .cod_severita = "WARNING", 
+      cod_controllo, 
+      des_controllo, 
+      msg,
+      dataset_general,
+      tab_diagnostica)
+
+# Error: COPY returned error: ERROR:  duplicate key value violates unique constraint "te_esito_controllo_dq_pkey"
+# DETAIL:  Key (cod_controllo, cod_processo, dat_report, num_versione)=(5, ecap11_irrbb_notional_equivalent, 2022-12-31, 9999) already exists.
+# CONTEXT:  COPY te_esito_controllo_dq, line 2
+
 # DQ b - check interfaccia 
 msg <- "Nella tabella TE_IRRBB_SHIFT_SENSITIVITY, il campo COD_PERIMETRO può contenere solo i valori PATH_DEPENDENT e NO_PATH_DEPENDENT"
 des_controllo <- "Nella tabella TE_IRRBB_SHIFT_SENSITIVITY {dat_report} v{versione_shift_sensitivity} la colonna COD_PERIMETRO contiene il valore {output2} per la chiave {output1}."

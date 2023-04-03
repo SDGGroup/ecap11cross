@@ -14,7 +14,8 @@ dq_b <- function(.con) {
 
   df_errors <- valore_campo_string(df_table = shift_sensitivity,
                                  col_check = 'COD_PERIMETRO',
-                                 val_string = c('PATH_DEPENDENT', 'NO_PATH_DEPENDENT'))
+                                 val_string = c('PATH_DEPENDENT', 'NO_PATH_DEPENDENT')) %>% 
+    mutate(conteggio = NA_integer_)
   
   return(df_errors)
 }

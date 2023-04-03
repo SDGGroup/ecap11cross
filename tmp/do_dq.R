@@ -68,7 +68,7 @@ do_dq <- function(.df_errors,
                          .dat_report)},
              error = function(e) {
                var_error <- TRUE
-               message("Errore nella scrittura dell'esito controllo ", .cod_controllo, "in ", .tab_diagnostica)
+               message("Errore nella scrittura dell'esito controllo ", .cod_controllo, " in ", .tab_diagnostica)
              })
   }
   tms_fine <- Sys.time()
@@ -96,10 +96,10 @@ do_dq <- function(.df_errors,
     )
     
     # scrive il dataframe su Postgres
-    tryCatch({write_df_on_postgres(nome_tabella = 'te_esito_controllo_dq',
-                                   oggetto = df_postgres)},
+    tryCatch({writedf2postgres(.nome_tabella = 'te_esito_controllo_dq',
+                               .oggetto = df_postgres)},
              error = function(e) {
-               message("Errore nella scrittura dell'esito controllo ", check, " in te_esito_controllo_dq")
+               message("Errore nella scrittura dell'esito controllo ", .cod_controllo, " in te_esito_controllo_dq")
                })
     
   }

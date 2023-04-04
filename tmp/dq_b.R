@@ -15,7 +15,10 @@ dq_b <- function(.con) {
   df_errors <- valore_campo_string(df_table = shift_sensitivity,
                                  col_check = 'COD_PERIMETRO',
                                  val_string = c('PATH_DEPENDENT', 'NO_PATH_DEPENDENT')) %>% 
-    mutate(conteggio = NA_integer_)
+    # aggiunto conteggio per allinearlo con data quality precedenti
+    # TODO: ripensare struttura output funzioni check interfaccia 
+    mutate(conteggio =  NA_real_) %>% 
+    add_row(tibble(output1 = NA, output2 = NA, conteggio = nrow(shift_sensitivity)))
   
   return(df_errors)
 }

@@ -44,7 +44,7 @@ source("tmp/dq_b.R")
 # setup
 project_id <- "prj-isp-ddle0-sand-prod-002"
 dataset <- "ds_ecap"
-out_version <- 9999
+out_version <- 10000
 # TODO: ricordarsi di cancellare tutte i dq scritti durante il test
 caricamento_shift_sensitivity <- 'FEEDING_AUTOMATICO'
 caricamento_discount_factor   <- 'CARICAMENTO_MANUALE'

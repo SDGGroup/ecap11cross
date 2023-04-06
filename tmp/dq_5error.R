@@ -5,14 +5,14 @@ dq_5error <- function(.con) {
   
   # crea tabella df_errors
   df1 <-  shift_sensitivity %>% 
-    filter(DAT_REPORT == '2022-12-31' & 
-             ID_VERSIONE == 0) %>% 
+    filter(DAT_REPORT == dat_report & 
+             ID_VERSIONE == versione_shift_sensitivity) %>% 
     summarise(conteggio = n(),
               riferimento = 1)
   
   df2 <- shift_sensitivity %>% 
-    filter(DAT_REPORT == '2022-12-31' & 
-             ID_VERSIONE == 0 & 
+    filter(DAT_REPORT == dat_report & 
+             ID_VERSIONE == versione_shift_sensitivity & 
              COD_PERIMETRO == 'NO_PATH_DEPENDENT') %>% 
     distinct(DES_SHOCK) %>% 
     summarise(output1 = n(),

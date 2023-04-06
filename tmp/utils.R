@@ -73,32 +73,25 @@ writedf2postgres <- function(.nome_tabella, .oggetto){
 
 # funzione che modifica df_errors per avere la struttura della TA_DIAGNOSTICA
 mutate_dferrors <- function(.df_errors, 
-                            .dat_report,
-                            .out_version,
                             .cod_processo, 
                             .cod_severita, 
                             .cod_controllo, 
                             .des_controllo,
-                            .msg){
+                            .msg,
+                            .params_config){
   
   df_errors <- .df_errors %>%
     mutate(COD_PROCESSO    = .cod_processo,
            COD_SEVERITA    = .cod_severita,
            COD_CONTROLLO   = .cod_controllo,
            DES_CONTROLLO   = .des_controllo,
-           DAT_REPORT      = .dat_report,
-           ID_VERSIONE     = as.integer(.out_version),
+           DAT_REPORT      = dat_report,
+           ID_VERSIONE     = as.integer(out_version),
            DAT_INSERIMENTO = Sys.Date(),
     ) 
   
-  # sostituisce espressioni tra {} in DES_ESITO = .msg con glue
-  # la priorit? ? data alle variabili della tibble e se non vengono trovate
-  # usa le variabili nell'ambiente 
   df_errors <- df_errors %>% 
-    mutate(DES_ESITO = as.character(glue(.msg)))
-  
-  # TODO: perche' avevano messo con sapply?
-  # df_errors$DES_ESITO <- sapply(as.character(df_errors$DES_ESITO)  , function (x) glue(x))
+    mutate(DES_ESITO = as.character(glue(.msg, .envir =  environment())))
   
   # eliminiamo se ci sono, le colonne che non sono richieste dalla tabella TE_DIAGNOSTICA
   df_errors <- df_errors %>% 

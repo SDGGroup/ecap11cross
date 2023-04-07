@@ -4,12 +4,12 @@
 \alias{retrieve_data_catalog}
 \title{retrieve_data_catalog}
 \usage{
-retrieve_data_catalog(cod_processo, catalog_table)
+retrieve_data_catalog(.cod_processo)
 }
 \arguments{
-\item{cod_processo}{\code{chr} codice del processo per il quale sono richiesti i controlli}
+\item{.cod_processo}{\code{chr} codice del processo per il quale sono richiesti i controlli}
 
-\item{catalog_table}{\code{chr} nome tabella Postgres contenente i controlli di data quality}
+\item{.catalog_table}{\code{chr} nome tabella Postgres contenente i controlli di data quality}
 
 \item{project_id}{\code{chr} nome del progetto GCP}
 }

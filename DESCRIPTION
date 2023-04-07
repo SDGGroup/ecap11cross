@@ -21,14 +21,12 @@ Depends:
 LazyData: true
 Imports:
   dplyr,
+  dbplyr,
   tibble,
-  lubridate,
   glue,
   bigrquery,
   bigQueryR,
   DBI,
   RPostgres,
-  ini,
-  stringr
 Suggests:
   roxygen2

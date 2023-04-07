@@ -1,181 +1,128 @@
-#' do_DQ
-#' @description Esegue il controllo corrispondente a `COD_CONTROLLO`. Ci sono due possibilità:
-#' * controllo tramite query. `catalog` deve avere popolato il campo `STMT_CONTROLLO`
-#'   con la query che verrà utilizzata per il controllo e `df_errors=NULL`
-#' * controllo diretto se `df_error` è passato come argomento
-#' @param check `chr` codice controllo da eseguire
-#' @param catalog `tibble` contiene tutti controlli del processo:
-#' * COD_CONTROLLO `chr`
-#' * COD_PROCESSO `chr`
-#' * COD_TIPO_CONTROLLO `int`
-#' * COD_FREQ_CONTROLLO `chr`
-#' * COD_SEVERITA `chr`
-#' * DES_CONTROLLO `chr`
-#' * MSG `chr`
-#' * STMT_CONTROLLO `chr`
-#' * FLG_ATTIVO `chr`
-#' * TMS_CREAZIONE ?
-#' * TMS_MODIFICA ?
-#' * DAT_FINE_VALIDITA ?
-#' * COD_UTENTE_MODIFICA ?
-#' * COD_UTENTE_CREAZIONE ?
-#' @param project_id `chr` nome del progetto GCP
-#' @param out_version `int` versione dell'output
-#' @param df_error `tibble`:
-#' * OUTPUT1 ?
-#' * OUTPUT2 ? 
-#' * OUTPUT3 ?
-#' * CONTEGGIO ? 
-#' @returns `bool` `TRUE` in presenza di errore nel controllo
+#' do_dq
+#' @description Esegue il data quality associato al `cod_controllo` del processo
+#'  `cod_processo`
+#' @param .df_errors può essere un `tibble`:
+#' * `output1` `int`
+#' * `output2` `int` opzionale
+#' * `output3` `int` opzionale
+#' * `conteggio` `int`
+#' oppure una funzione che restituisce `df_errors` associato al data quality 
+#' @param .cod_processo `chr` codice del processo
+#' @param .cod_severita `chr` codice severità del dq
+#' @param .cod_controllo `chr` codice del controllo
+#' @param .des_controllo `chr` descrizione del controllo
+#' @param .msg `chr` messaggio associato al controllo da scrivere su Big Query
+#' @param .con `S4 object` usato per comunicare con il database
+#' @param .params_config `list` contiene i parametri aggiunti specifici del controllo
+#' (tutti i parametri inclusi tra {} in msg, `dat_report` e `out_versione`)
+#' @returns `chr` OK/KO
 #' @export
 
-do_DQ <- function(check, catalog, project_id, out_version, df_errors = NULL) {
-
-  #TODO: aggiungere tipi e colonne di df_error nella documentazione
-  #TODO: aggiungere colonne e tipi di catalog
+do_dq <- function(.dq, # funzione o df_errors
+                  .cod_processo, 
+                  .cod_severita, 
+                  .cod_controllo, 
+                  .des_controllo, 
+                  .msg,
+                  .con, 
+                  .params_config){
   
-  out2log("\n Diagnostico ",check," in esecuzione...")
-
-  B          <- FALSE
-  check_row  <- catalog %>% filter(COD_CONTROLLO==check)
+  message("Diagnostico ", .cod_controllo, " in esecuzione")
+  
+  # assegna variabili a parametri nella lista 
+  list2env(.params_config, envir = environment())
+  
+  # esito DQ, B == TRUE ---> errore DQ
   tms_inizio <- Sys.time()
-
-  # Se df_error non è fornito in input lo creiamo eseguendo una query su BQ
-  # Questa query è definita nel campo STMT_CONTROLLO del catalog.
-
-  if (is.null(df_errors)) {
-
-    out2log('\n Controllo da query \n')
-    qry       <- glue(check_row %>%
-                        select(STMT_CONTROLLO) %>%
-                        pull())
-    out2log("\n ",qry)
-
-    temp      <- bq_project_query(project_id, qry)
-    df_errors <- bq_table_download(temp)
-
+  cod_esito <- "OK"
+  
+  # R un linguaggio lexically scoped, quando una funzione interna f2 (.dq)
+  # a un'altra funzione f1 (do_dq) è chiamata, non cerca le variabili dentro env di f1
+  # resettiamo l'env di .dq così è come se .dq fosse definita dentro do_dq
+  environment(.dq) <- environment()
+  # estrae df_error 
+  if(class(.dq) == "function"){
+    df_errors <- .dq(.con)
+  } else {
+    df_errors <- .dq
   }
-
-  # Casistica in cui non ho il conteggio (controllo di data quality ERROR)
-  # se il controllo è andato bene non ho righe,
-  # ma non riesco ad utilizzare il resto del codice perchè non aggiunge la colonna conteggio
-  # quindi la aggiungiamo in maniera fittizia
-
-  if (check_row$COD_SEVERITA %in% c('ERROR') && nrow(df_errors) == 0) {
-    df_errors <- tibble()
-    df_errors <- tibble(output1 = NA_character_,
-                        conteggio = 1)
-  }
-
-  conteggio_record_ko <- 0
-  conteggio_record    <- df_errors %>%
+  
+  # salva conteggio ed elimina dal df_errors
+  conteggio_record <- df_errors %>%
     select(conteggio) %>%
     distinct() %>%
     pull()
+  
   df_errors <- df_errors %>%
-    mutate(conteggio = NA_integer_)
-
-  # Variabili di controllo esito scrittura su DataBase
-  var_error <- FALSE     # Per BQ TA_DIAGNOSTICA
-  uscita    <- FALSE     # Per Postgres te_esito_controllo_dq
-
-  first_output1 <- df_errors %>%
+    select(-conteggio)
+  
+  first_output <- df_errors %>%
     select(output1) %>%
     slice(1) %>%
     pull()
-
-  if (!(is.na(first_output1))) {
-
-    B <- TRUE
-
-    # df_errors viene modificata per avere la struttura della TA_DIAGNOSTICA
-    conteggio_record_ko       <- nrow(df_errors)
-
-    df_errors <- df_errors %>%
-      bind_cols(
-        check_row %>%
-          select(COD_PROCESSO,
-                 COD_SEVERITA,
-                 COD_CONTROLLO,
-                 DES_CONTROLLO,
-                 MSG)
-      ) %>%
-      mutate(DAT_REPORT      = dat_report,
-             ID_VERSIONE     = as.integer(out_version),
-             DAT_INSERIMENTO = Sys.Date(),
-             DES_ESITO       = MSG
-      )
-
-    errori <- colnames(df_errors)
-    if ("output1" %in% errori) {
-      df_errors$DES_ESITO <- str_replace_all(df_errors$DES_ESITO, '\\{output1\\}',
-                                             as.character(df_errors$output1))
-    }
-
-    if ("output2" %in% errori) {
-      df_errors$DES_ESITO <- str_replace_all(df_errors$DES_ESITO, '\\{output2\\}',
-                                             as.character(df_errors$output2))
-    }
-
-    if ("output3" %in% errori) {
-      df_errors$DES_ESITO <- str_replace_all(df_errors$DES_ESITO, '\\{output3\\}',
-                                             as.character(df_errors$output3))
-    }
-
-    df_errors$DES_ESITO <- sapply(as.character(df_errors$DES_ESITO)  , function (x) glue(x))
-
-    #eliminiamo se ci sono, le colonne che non sono richieste dalla tabella TE_DIAGNOSTICA
-
-    df_errors$output1 <- NULL
-    df_errors$output2 <- NULL
-    df_errors$output3 <- NULL
-
+  
+  # conteggio errori 
+  conteggio_record_ko <- df_errors %>%
+    filter(!is.na(output1)) %>% 
+    count() %>% 
+    pull(n)
+  
+  # first_output != NA -----> DQ fallito
+  if (!(is.na(first_output))) {
+    
+    cod_esito <- "KO"
+    
+    # prepara df_error per scrittura
+    environment(mutate_dferrors) <- environment()
+    df_errors <- mutate_dferrors(df_errors,
+                                 .cod_processo,
+                                 .cod_severita,
+                                 .cod_controllo,
+                                 .des_controllo,
+                                 .msg)
+    
     # scrive gli esiti dei controlli su BigQuery, tabella TE_DIAGNOSTICA
-    tryCatch({write_df_2_BQ(project_id,
-                            df_errors,
-                            dataset = DATASET_GENERAL,
-                            tabella = TAB_DIAGNOSTICA)},
-             error = function(e) {var_error <<- TRUE})
-
-
-    tms_fine <- now()
-
-    # in caso di cod_severita = WARNING viene aggiornata anche la tabella Postgres
-    if (check_row$COD_SEVERITA %in% c('WARNING')) {
-
-      # crea il dataframe da scrivere su Postgres
-      df_postgres <- tibble(dat_report = dat_report,
-                            num_versione = as.integer(out_version),
-                            cod_processo = check_row$COD_PROCESSO,
-                            cod_controllo = check_row$COD_CONTROLLO,
-                            des_controllo =  check_row$DES_CONTROLLO,
-                            cod_esito = (if(var_error){'ERROR'} else if(B){'KO'} else {'OK'}),
-                            dat_inserimento = dat_report,
-                            num_tot_casi = conteggio_record,
-                            num_tot_casi_warn =  (if(check_row$COD_SEVERITA == 'ERROR'){0} else {conteggio_record_ko}),
-                            num_tot_casi_error = (if(check_row$COD_SEVERITA == 'ERROR'){conteggio_record_ko} else {0}),
-                            tms_inizio = tms_inizio,
-                            tms_fine = tms_fine
-      )
-
-      # scrive il dataframe su Postgres
-      tryCatch({write_df_on_postgres(nome_tabella = 'te_esito_controllo_dq',
-                                     oggetto = df_postgres)},
-               error = function(e) {uscita <<- TRUE})
-    }
-
-    out2log("\n Diagnostico ",check," eseguito\n\n")
-
+    tryCatch({writedf2bq(project_id,
+                         df_errors,
+                         .dataset = "ds_ddl_general",
+                         .tabella = "TE_DIAGNOSTICA",
+                         out_version,
+                         dat_report)},
+             error = function(e) {
+               message("Errore nella scrittura dell'esito controllo ", .cod_controllo, " in TE_DIAGNOSTICA")
+             })
   }
-
-  if (var_error) {
-    out2log("\n Errore nella scrittura dell'esito controllo ", check, " in TA_DIAGNOSTICA \n")
+  
+  tms_fine <- Sys.time()
+  
+  # in caso di cod_severita = WARNING viene aggiornata anche la tabella Postgres
+  if (.cod_severita == "WARNING") {
+    
+    # crea il dataframe da scrivere su Postgres
+    df_postgres <- tibble(dat_report =  dat_report,
+                          num_versione = out_version,
+                          cod_processo = .cod_processo,
+                          cod_controllo = .cod_controllo,
+                          des_controllo =  .des_controllo,
+                          cod_esito = cod_esito,
+                          dat_inserimento = dat_report,
+                          num_tot_casi = conteggio_record,
+                          num_tot_casi_warn =  conteggio_record_ko,
+                          num_tot_casi_error = 0,
+                          tms_inizio = tms_inizio,
+                          tms_fine = tms_fine
+    )
+    
+    # scrive il dataframe su Postgres
+    tryCatch({writedf2postgres(.nome_tabella = 'te_esito_controllo_dq',
+                               .dataframe = df_postgres)},
+             error = function(e) {
+               message("Errore nella scrittura dell'esito controllo ", .cod_controllo, " in te_esito_controllo_dq")
+             })
+    
   }
-
-  if (uscita) {
-    out2log("\n Errore nella scrittura dell'esito controllo ", check, " in te_esito_controllo_dq \n")
-  }
-
-  return(B)
-
+  
+  message("Diagnostico ", .cod_controllo, " eseguito")
+  
+  return(cod_esito)
 }

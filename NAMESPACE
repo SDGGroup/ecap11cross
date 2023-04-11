@@ -3,6 +3,8 @@
 export(connect2bq)
 export(connect2postgres)
 export(do_dq)
+export(load_environment)
+export(load_environment_local)
 export(mutate_dferrors)
 export(retrieve_data_catalog)
 export(writedf2bq)

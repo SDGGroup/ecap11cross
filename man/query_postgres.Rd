@@ -4,9 +4,11 @@
 \alias{query_postgres}
 \title{query_postgres}
 \usage{
-query_postgres(query)
+query_postgres(.con, .query)
 }
 \arguments{
+\item{.con}{un oggetto output di \link{connect2postgres}, usato per comunicare con il database}
+
 \item{query}{\code{chr} query da eseguire su Postgres.}
 }
 \value{

@@ -21,6 +21,7 @@ Depends:
 LazyData: true
 Imports:
   dplyr,
+  tidyr,
   dbplyr,
   tibble,
   glue,

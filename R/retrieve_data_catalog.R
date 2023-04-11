@@ -1,8 +1,7 @@
 #' retrieve_data_catalog
 #' @description Esegue il download dei controlli di data quality da Postgres in base al processo indicato
+#' @param .con  un oggetto output di \link{connect2postgres}, usato per comunicare con il database 
 #' @param .cod_processo `chr` codice del processo per il quale sono richiesti i controlli
-#' @param .catalog_table `chr` nome tabella Postgres contenente i controlli di data quality
-#' @param project_id `chr` nome del progetto GCP
 #' @returns `tibble`:
 #' * COD_CONTROLLO  `chr`
 #' * COD_PROCESSO `chr`
@@ -19,17 +18,13 @@
 #' * COD_UTENTE_CREAZIONE `chr`
 #' @export
 
-retrieve_data_catalog <- function(.cod_processo){
-
-  con <- connect2postgres()
+retrieve_data_catalog <- function(.con, .cod_processo){
   
-  ta_controllo_dq <- tbl(con, "ta_controllo_dq")
+  ta_controllo_dq <- tbl(.con, "ta_controllo_dq")
 
   catalog <- ta_controllo_dq %>% 
     filter(cod_processo == .cod_processo) %>% 
     collect()
-
-  dbDisconnect(con)
 
   return(catalog)
 

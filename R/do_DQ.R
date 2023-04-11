@@ -12,7 +12,8 @@
 #' @param .cod_controllo `chr` codice del controllo
 #' @param .des_controllo `chr` descrizione del controllo
 #' @param .msg `chr` messaggio associato al controllo da scrivere su Big Query
-#' @param .con `S4 object` usato per comunicare con il database
+#' @param .con_bq `S4 object` usato per comunicare con il database Big Query 
+#' @param .con_postgres `S4 object` usato per comunicare con il database Postgres 
 #' @param .params_config `list` contiene i parametri aggiunti specifici del controllo
 #' (tutti i parametri inclusi tra {} in msg, `dat_report` e `out_versione`)
 #' @returns `chr` OK/KO
@@ -24,7 +25,8 @@ do_dq <- function(.dq, # funzione o df_errors
                   .cod_controllo, 
                   .des_controllo, 
                   .msg,
-                  .con, 
+                  .con_bq,
+                  .con_postgres,
                   .params_config){
   
   message("Diagnostico ", .cod_controllo, " in esecuzione")
@@ -41,11 +43,11 @@ do_dq <- function(.dq, # funzione o df_errors
   # resettiamo l'env di .dq così è come se .dq fosse definita dentro do_dq
   environment(.dq) <- environment()
   # estrae df_error 
-  if(class(.dq) == "function"){
-    df_errors <- .dq(.con)
-  } else {
-    df_errors <- .dq
-  }
+  #if(class(.dq) == "function"){
+    df_errors <- .dq(.con_bq)
+  #} else {
+  #  df_errors <- .dq
+  #}
   
   # salva conteggio ed elimina dal df_errors
   conteggio_record <- df_errors %>%
@@ -114,7 +116,8 @@ do_dq <- function(.dq, # funzione o df_errors
     )
     
     # scrive il dataframe su Postgres
-    tryCatch({writedf2postgres(.nome_tabella = 'te_esito_controllo_dq',
+    tryCatch({writedf2postgres(.con = .con_bq,
+                               .nome_tabella = 'te_esito_controllo_dq',
                                .dataframe = df_postgres)},
              error = function(e) {
                message("Errore nella scrittura dell'esito controllo ", .cod_controllo, " in te_esito_controllo_dq")

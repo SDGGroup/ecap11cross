@@ -11,7 +11,8 @@ do_dq(
   .cod_controllo,
   .des_controllo,
   .msg,
-  .con,
+  .con_bq,
+  .con_postgres,
   .params_config
 )
 }
@@ -26,7 +27,9 @@ do_dq(
 
 \item{.msg}{\code{chr} messaggio associato al controllo da scrivere su Big Query}
 
-\item{.con}{\verb{S4 object} usato per comunicare con il database}
+\item{.con_bq}{\verb{S4 object} usato per comunicare con il database Big Query}
+
+\item{.con_postgres}{\verb{S4 object} usato per comunicare con il database Postgres}
 
 \item{.params_config}{\code{list} contiene i parametri aggiunti specifici del controllo
 (tutti i parametri inclusi tra {} in msg, \code{dat_report} e \code{out_versione})}

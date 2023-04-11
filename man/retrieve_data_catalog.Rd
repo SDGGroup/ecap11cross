@@ -4,14 +4,12 @@
 \alias{retrieve_data_catalog}
 \title{retrieve_data_catalog}
 \usage{
-retrieve_data_catalog(.cod_processo)
+retrieve_data_catalog(.con, .cod_processo)
 }
 \arguments{
+\item{.con}{un oggetto output di \link{connect2postgres}, usato per comunicare con il database}
+
 \item{.cod_processo}{\code{chr} codice del processo per il quale sono richiesti i controlli}
-
-\item{.catalog_table}{\code{chr} nome tabella Postgres contenente i controlli di data quality}
-
-\item{project_id}{\code{chr} nome del progetto GCP}
 }
 \value{
 \code{tibble}:

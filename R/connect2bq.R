@@ -7,7 +7,7 @@
 
 connect2bq <- function(.project_id, .dataset){
   
-  # autenticazzione a big query
+  # autenticazione a big query
   bqr_auth()
   
   # connessione a big query

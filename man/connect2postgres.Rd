@@ -4,7 +4,18 @@
 \alias{connect2postgres}
 \title{connect2postgres}
 \usage{
-connect2postgres()
+connect2postgres(.host, .port, .dbname, .user, .password)
+}
+\arguments{
+\item{.host}{\code{chr}}
+
+\item{.port}{\code{chr}}
+
+\item{.dbname}{\code{chr}}
+
+\item{.user}{\code{chr}}
+
+\item{.password}{\code{chr}}
 }
 \value{
 Un S4 object ereditato da \link[DBI]{dbConnect}, usato per comunicare con il database

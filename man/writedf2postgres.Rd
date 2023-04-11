@@ -4,15 +4,17 @@
 \alias{writedf2postgres}
 \title{writedf2postgres}
 \usage{
-writedf2postgres(.nome_tabella, .dataframe)
+writedf2postgres(.con, .nome_tabella, .dataframe)
 }
 \arguments{
+\item{.con}{un oggetto output di \link{connect2postgres}, usato per comunicare con il database}
+
 \item{.nome_tabella}{\code{chr} nome tabella di destinazione}
 
 \item{.dataframe}{\code{tibble} tibble da scrivere}
 }
 \value{
-\code{bool} TRUE, invisibilmente.
+\code{bool} TRUE, invisibilmente
 }
 \description{
 Funzione per appendere un dataframe a una tabella del database \code{ddl-dcerm-db} su Postgres

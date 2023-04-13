@@ -1,12 +1,12 @@
-#' do_dq
-#' @description Esegue il data quality associato al `cod_controllo` del processo
-#'  `cod_processo`
-#' @param .df_errors può essere un `tibble`:
+#' eval_dferrors
+#' @description 
+#' Elabora il `df_errors` associato al `cod_controllo` del processo `cod_processo`
+#' per la scrittura su Big Query e Postgres
+#' @param .df_errors `tibble`:
 #' * `output1` `int`
 #' * `output2` `int` opzionale
 #' * `output3` `int` opzionale
 #' * `conteggio` `int`
-#' oppure una funzione che restituisce `df_errors` associato al data quality 
 #' @param .cod_processo `chr` codice del processo
 #' @param .cod_severita `chr` codice severità del dq
 #' @param .cod_controllo `chr` codice del controllo
@@ -19,15 +19,15 @@
 #' @returns `chr` OK/KO
 #' @export
 
-do_dq <- function(.dq, # funzione o df_errors
-                  .cod_processo, 
-                  .cod_severita, 
-                  .cod_controllo, 
-                  .des_controllo, 
-                  .msg,
-                  .con_bq,
-                  .con_postgres,
-                  .params_config){
+eval_dferrors <- function(.df_errors, # funzione o df_errors
+                          .cod_processo, 
+                          .cod_severita, 
+                          .cod_controllo, 
+                          .des_controllo, 
+                          .msg,
+                          .con_bq,
+                          .con_postgres,
+                          .params_config){
   
   message("Diagnostico ", .cod_controllo, " in esecuzione")
   
@@ -38,33 +38,22 @@ do_dq <- function(.dq, # funzione o df_errors
   tms_inizio <- Sys.time()
   cod_esito <- "OK"
   
-  # R un linguaggio lexically scoped, quando una funzione interna f2 (.dq)
-  # a un'altra funzione f1 (do_dq) è chiamata, non cerca le variabili dentro env di f1
-  # resettiamo l'env di .dq così è come se .dq fosse definita dentro do_dq
-  environment(.dq) <- environment()
-  # estrae df_error 
-  #if(class(.dq) == "function"){
-    df_errors <- .dq(.con_bq)
-  #} else {
-  #  df_errors <- .dq
-  #}
-  
   # salva conteggio ed elimina dal df_errors
-  conteggio_record <- df_errors %>%
+  conteggio_record <- .df_errors %>%
     select(conteggio) %>%
     distinct() %>%
     pull()
   
-  df_errors <- df_errors %>%
+  .df_errors <- .df_errors %>%
     select(-conteggio)
   
-  first_output <- df_errors %>%
+  first_output <- .df_errors %>%
     select(output1) %>%
     slice(1) %>%
     pull()
   
   # conteggio errori 
-  conteggio_record_ko <- df_errors %>%
+  conteggio_record_ko <- .df_errors %>%
     filter(!is.na(output1)) %>% 
     count() %>% 
     pull(n)
@@ -75,17 +64,17 @@ do_dq <- function(.dq, # funzione o df_errors
     cod_esito <- "KO"
     
     # prepara df_error per scrittura
-    environment(mutate_dferrors) <- environment()
-    df_errors <- mutate_dferrors(df_errors,
+    .df_errors <- mutate_dferrors(.df_errors,
                                  .cod_processo,
                                  .cod_severita,
                                  .cod_controllo,
                                  .des_controllo,
-                                 .msg)
+                                 .msg,
+                                 .params_config)
     
     # scrive gli esiti dei controlli su BigQuery, tabella TE_DIAGNOSTICA
     tryCatch({writedf2bq(project_id,
-                         df_errors,
+                         .df_errors,
                          .dataset = "ds_ddl_general",
                          .tabella = "TE_DIAGNOSTICA",
                          out_version,

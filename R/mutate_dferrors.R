@@ -5,13 +5,13 @@
 #' * `output2` `int` opzionale
 #' * `output3` `int` opzionale
 #' * `conteggio` `int`
-#' @inheritParams do_dq
-# #' @param .cod_processo (inherited from do_dq)
-# #' @param .cod_severita  (inherited from do_dq)
-# #' @param .cod_controllo  (inherited from do_dq)
-# #' @param .des_controllo  (inherited from do_dq)
-# #' @param .msg  (inherited from do_dq)
-# #' @param .params_ (inherited from do_dq)
+#' @inheritParams eval_dferrors
+# #' @param .cod_processo (inherited from eval_dferrors)
+# #' @param .cod_severita  (inherited from eval_dferrors)
+# #' @param .cod_controllo  (inherited from eval_dferrors)
+# #' @param .des_controllo  (inherited from eval_dferrors)
+# #' @param .msg  (inherited from eval_dferrors)
+# #' @param .params_config (inherited from eval_dferrors)
 #' @returns `tibble`:
 #' * `COD_PROCESSO` `chr`
 #' * `COD_SEVERITA` `chr`

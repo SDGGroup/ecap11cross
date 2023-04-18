@@ -30,4 +30,7 @@ Imports:
   DBI,
   RPostgres,
 Suggests:
-  roxygen2
+    rmarkdown,
+    knitr,
+    roxygen2
+VignetteBuilder: knitr

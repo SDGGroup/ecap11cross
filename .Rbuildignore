@@ -1,4 +1,4 @@
 ^renv$
 ^renv\.lock$
-^ecap11cross\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$

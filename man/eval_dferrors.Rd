@@ -40,7 +40,7 @@ eval_dferrors(
 \item{.con_postgres}{\verb{S4 object} usato per comunicare con il database Postgres}
 
 \item{.params_config}{\code{list} contiene i parametri aggiunti specifici del controllo
-(tutti i parametri inclusi tra {} in msg, \code{dat_report} e \code{out_versione})}
+(tutti i parametri inclusi tra {} in msg, \code{dat_report} e \code{out_version})}
 }
 \value{
 \code{chr} OK/KO

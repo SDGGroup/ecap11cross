@@ -34,7 +34,7 @@ mutate_dferrors(
 \item{.msg}{\code{chr} messaggio associato al controllo da scrivere su Big Query}
 
 \item{.params_config}{\code{list} contiene i parametri aggiunti specifici del controllo
-(tutti i parametri inclusi tra {} in msg, \code{dat_report} e \code{out_versione})}
+(tutti i parametri inclusi tra {} in msg, \code{dat_report} e \code{out_version})}
 }
 \value{
 \code{tibble}:

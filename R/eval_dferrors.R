@@ -15,7 +15,7 @@
 #' @param .con_bq `S4 object` usato per comunicare con il database Big Query 
 #' @param .con_postgres `S4 object` usato per comunicare con il database Postgres 
 #' @param .params_config `list` contiene i parametri aggiunti specifici del controllo
-#' (tutti i parametri inclusi tra {} in msg, `dat_report` e `out_versione`)
+#' (tutti i parametri inclusi tra {} in msg, `dat_report` e `out_version`)
 #' @returns `chr` OK/KO
 #' @export
 

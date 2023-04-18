@@ -4,12 +4,14 @@
 \alias{retrieve_data_catalog}
 \title{retrieve_data_catalog}
 \usage{
-retrieve_data_catalog(.con, .cod_processo)
+retrieve_data_catalog(.con, .cod_processo, .data_quality_postgres)
 }
 \arguments{
 \item{.con}{un oggetto output di \link{connect2postgres}, usato per comunicare con il database}
 
 \item{.cod_processo}{\code{chr} codice del processo per il quale sono richiesti i controlli}
+
+\item{.data_quality_postgres}{\code{chr}}
 }
 \value{
 \code{tibble}:
@@ -30,5 +32,8 @@ retrieve_data_catalog(.con, .cod_processo)
 }
 }
 \description{
-Esegue il download dei controlli di data quality da Postgres in base al processo indicato
+Esegue il download dei controlli di data quality da Postgres
+(\code{.data_quality_postgres == "SI"})  o carica
+i controlli di data quality dal file in locale (\code{.data_quality_postgres == "NO"})
+in base al processo indicato
 }

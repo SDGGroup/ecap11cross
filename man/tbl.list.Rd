@@ -4,7 +4,7 @@
 \alias{tbl.list}
 \title{tbl.list}
 \usage{
-tbl.list(src, df_name)
+\method{tbl}{list}(src, df_name)
 }
 \arguments{
 \item{src}{\code{list}}

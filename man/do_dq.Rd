@@ -4,7 +4,14 @@
 \alias{do_dq}
 \title{do_dq}
 \usage{
-do_dq(.catalog, .con, .con_bigquery, .con_postgres, .params_config)
+do_dq(
+  .catalog,
+  .con,
+  .con_bigquery,
+  .con_postgres,
+  .params_config,
+  .lst_df_errors = NULL
+)
 }
 \arguments{
 \item{.catalog}{\code{tibble} contiene tutti controlli del processo:
@@ -36,6 +43,10 @@ di \code{tibble} nella fase di esecuzione delle funzioni contenute in \code{nome
 
 \item{.params_config}{\code{list} contiene i parametri aggiuntivi necessari per eseguire
 le funzioni di data quality}
+
+\item{.lst_df_errors}{\verb{named list} lista di \code{df_errors} relativi ai data quality
+eseguiti durante la business logic, in cui il nome di ciascun data frame è il
+rispettivo codice controllo associato}
 }
 \value{
 \code{tibble}:

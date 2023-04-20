@@ -24,6 +24,9 @@
 #' @param .con_postgres `S4 object` usato per comunicare con il database Postgres 
 #' @param .params_config `list` contiene i parametri aggiuntivi necessari per eseguire
 #' le funzioni di data quality 
+#' @param .lst_df_errors `named list` lista di `df_errors` relativi ai data quality 
+#' eseguiti durante la business logic, in cui il nome di ciascun data frame è il
+#' rispettivo codice controllo associato 
 #' @returns  `tibble`:
 #' * `cod_processo` `chr`
 #' * `cod_controllo` `chr`
@@ -32,19 +35,29 @@
 #' * `des_controllo` `chr`
 #' @export
  
-do_dq <- function(.catalog, .con, .con_bigquery, .con_postgres, .params_config){
+do_dq <- function(.catalog, .con, .con_bigquery, .con_postgres, .params_config, .lst_df_errors = NULL){
   
-  # creazione df_errors
-  catalog <- .catalog %>% 
-    filter(check_interfaccia == "NO") %>% 
-    mutate(df_errors = invoke_map(nome_funzione, .con = .con, .params_config = .params_config))
-  
-  catalog_interfaccia <- .catalog %>% 
-    filter(check_interfaccia == "SI") %>% 
-    mutate(df_errors = invoke_map(nome_funzione, .con = .con))
+    # creazione df_errors
+    catalog <- .catalog %>% 
+      filter(tipo_controllo == "pre_bl") %>% 
+      mutate(df_errors = invoke_map(nome_funzione, .con = .con, .params_config = .params_config))
+    
+    catalog_interfaccia <- .catalog %>% 
+      filter(tipo_controllo == "interfaccia") %>% 
+      mutate(df_errors = invoke_map(nome_funzione, .con = .con))
+    
+    if(!is.null(.lst_df_errors)) {
+      catalog_bl <- .catalog %>% 
+        filter(tipo_controllo == "post_bl") %>% 
+        inner_join(tibble(cod_processo = names(.lst_df_errors), df_errors = .lst_df_errors),
+                   by = "cod_processo")
+    } else {
+      catalog_bl <- NULL
+    }
   
   catalog <- catalog %>% 
-    bind_rows(catalog_interfaccia)
+    bind_rows(catalog_interfaccia) %>% 
+    bind_rows(catalog_bl)
   
   # scrittura su big query e/o postgres
   df_esito <- catalog %>% 

@@ -7,13 +7,13 @@
 do_query(.con, .query)
 }
 \arguments{
-\item{.con}{un oggetto output di \link{connect2postgres}, usato per comunicare con il database}
+\item{.con}{\verb{S4 object} usato per comunicare con il database}
 
-\item{query}{\code{chr} query da eseguire su Postgres.}
+\item{.query}{\code{chr} query da eseguire su Postgres.}
 }
 \value{
 \code{tibble}
 }
 \description{
-Funzione che esegue una query data in input in Postgres
+Funzione che esegue una query data in input
 }

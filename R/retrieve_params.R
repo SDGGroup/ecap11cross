@@ -8,8 +8,8 @@
 #' 
 retrieve_params <- function(.con, .id_elaborazione){
   
-  params <- query_postgres(.con = .con,
-                           .query = glue("select * from get_param_all_version({.id_elaborazione})"))
+  params <- do_query(.con = .con,
+                     .query = glue("select * from get_param_all_version({.id_elaborazione})"))
   return(tibble(params))
   
 }

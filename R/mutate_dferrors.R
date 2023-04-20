@@ -30,6 +30,9 @@ mutate_dferrors <- function(.df_errors,
                             .msg,
                             .params_config){
   
+  # assegna variabili a parametri nella lista 
+  list2env(.params_config, envir = environment())
+  
   df_errors <- .df_errors %>%
     mutate(COD_PROCESSO    = .cod_processo,
            COD_SEVERITA    = .cod_severita,

@@ -7,7 +7,7 @@
 #' @param .out_version `int` ID_VERSIONE da inserire nel dataframe
 #' @param .dat_report `chr` DAT_REPORT da inserire nel dataframe
 #' @param .tab_schema uno schema object che può essere passato come argomento di \link[bigQueryR]{bqr_upload_data}
-#' @returns `bool` TRUE, invisibilmente. 
+#' @returns `bool` `TRUE` se scrittura è avvenuta con successo, `FALSE` altrimenti. 
 #' @export
 
 writedf2bq <- function(.project_id, 
@@ -24,20 +24,32 @@ writedf2bq <- function(.project_id,
     )
   
   if(is.null(.tab_schema)){
-    tab_schema <- schema_fields(dataframe)
+    .tab_schema <- schema_fields(dataframe)
   }
   
   # TODO: Questo non è un errore vero:
   # i 2023-03-31 11:15:13 > Request Status Code:  404
-  # Error: API returned
+  # Error: API returned etc...
   # il df viene scritto correttamente 
-  bqr_upload_data(projectId         = .project_id,
-                  datasetId         = .dataset,
-                  tableId           = .tabella,
-                  upload_data       = dataframe,
-                  create            = 'CREATE_IF_NEEDED',
-                  writeDisposition  = 'WRITE_APPEND',
-                  wait              = FALSE,
-                  schema            = tab_schema)
+  res <- tryCatch({
+    bqr_upload_data(projectId         = .project_id,
+                    datasetId         = .dataset,
+                    tableId           = .tabella,
+                    upload_data       = dataframe,
+                    create            = 'CREATE_IF_NEEDED',
+                    writeDisposition  = 'WRITE_APPEND',
+                    wait              = FALSE,
+                    schema            = .tab_schema)
+  }, error = function(e) {
+    if(startsWith(e$message, prefix = paste("API returned: Not found: Job", .project_id))){
+      message("Data successfully written")
+      return(TRUE)
+    }
+    else{
+      message(e$message)
+      return(FALSE)
+    }
+  })
   
+ return(res)
 }

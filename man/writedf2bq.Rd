@@ -30,7 +30,7 @@ writedf2bq(
 \item{.tab_schema}{uno schema object che può essere passato come argomento di \link[bigQueryR]{bqr_upload_data}}
 }
 \value{
-\code{bool} TRUE, invisibilmente.
+\code{bool} \code{TRUE} se scrittura è avvenuta con successo, \code{FALSE} altrimenti.
 }
 \description{
 Funzione per l'inserimento di dati su Big Query

@@ -37,25 +37,35 @@
  
 do_dq <- function(.catalog, .con, .con_bigquery, .con_postgres, .params_config, .lst_df_errors = NULL){
   
-    # creazione df_errors
-    catalog <- .catalog %>% 
-      filter(tipo_controllo == "pre_bl") %>% 
-      mutate(df_errors = invoke_map(nome_funzione, .con = .con, .params_config = .params_config))
-    
-    catalog_interfaccia <- .catalog %>% 
-      filter(tipo_controllo == "interfaccia") %>% 
-      mutate(df_errors = invoke_map(nome_funzione, .con = .con))
-    
-    if(!is.null(.lst_df_errors)) {
-      catalog_bl <- .catalog %>% 
-        filter(tipo_controllo == "post_bl") %>% 
-        inner_join(tibble(cod_processo = names(.lst_df_errors), df_errors = .lst_df_errors),
-                   by = "cod_processo")
-    } else {
-      catalog_bl <- NULL
-    }
+  # creazione df_errors
+  if (any(.catalog$tipo_controllo == "pre_bl")) {
+     catalog_pre <- .catalog %>%
+      filter(tipo_controllo == "pre_bl") %>%
+      rowwise() %>% 
+      mutate(df_errors = list(do.call(nome_funzione, list(.con = .con, .params_config = .params_config))))
+  } else {
+    catalog_pre <- NULL
+  }
   
-  catalog <- catalog %>% 
+  if (any(.catalog$tipo_controllo == "interfaccia")) {
+    catalog_interfaccia <- .catalog %>%
+      filter(tipo_controllo == "interfaccia") %>%
+      rowwise() %>% 
+      mutate(df_errors = list(do.call(nome_funzione, list(.con = .con))))
+  } else {
+    catalog_interfaccia <- NULL
+  }
+
+  if(!is.null(.lst_df_errors)) {
+    catalog_bl <- .catalog %>% 
+      filter(tipo_controllo == "post_bl") %>% 
+      inner_join(tibble(cod_processo = names(.lst_df_errors), df_errors = .lst_df_errors),
+                   by = "cod_processo")
+  } else {
+    catalog_bl <- NULL
+  }
+  
+  catalog <- catalog_pre %>% 
     bind_rows(catalog_interfaccia) %>% 
     bind_rows(catalog_bl)
   

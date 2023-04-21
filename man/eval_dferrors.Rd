@@ -19,9 +19,9 @@ eval_dferrors(
 \arguments{
 \item{.df_errors}{\code{tibble}:
 \itemize{
-\item \code{output1} \code{int}
-\item \code{output2} \code{int} opzionale
-\item \code{output3} \code{int} opzionale
+\item \code{output1} \code{int} o \code{int}
+\item \code{output2} \code{int} o \code{int} opzionale
+\item \code{output3} \code{int} o \code{int} opzionale
 \item \code{conteggio} \code{int}
 }}
 

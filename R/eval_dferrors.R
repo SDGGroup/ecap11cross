@@ -4,9 +4,9 @@
 #' Elabora il `df_errors` associato al `cod_controllo` del processo `cod_processo`
 #' per la scrittura su Big Query e Postgres
 #' @param .df_errors `tibble`:
-#' * `output1` `int`
-#' * `output2` `int` opzionale
-#' * `output3` `int` opzionale
+#' * `output1` `int` o `int`
+#' * `output2` `int` o `int` opzionale
+#' * `output3` `int` o `int` opzionale
 #' * `conteggio` `int`
 #' @param .cod_processo `chr` codice del processo
 #' @param .cod_severita `chr` codice severità del dq

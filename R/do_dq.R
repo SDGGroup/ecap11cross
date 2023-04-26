@@ -59,8 +59,8 @@ do_dq <- function(.catalog, .con, .con_bigquery, .con_postgres, .params_config, 
   if(!is.null(.lst_df_errors)) {
     catalog_bl <- .catalog %>% 
       filter(tipo_controllo == "post_bl") %>% 
-      inner_join(tibble(cod_processo = names(.lst_df_errors), df_errors = .lst_df_errors),
-                   by = "cod_processo")
+      inner_join(tibble(nome_funzione = names(.lst_df_errors), df_errors = .lst_df_errors),
+                   by = "nome_funzione")
   } else {
     catalog_bl <- NULL
   }
